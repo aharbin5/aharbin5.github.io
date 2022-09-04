@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="jquery-3.6.1.js"></script>
+    <script>
+        var counter = 0;
+
+        $(document).ready(function(){
+            $("img").hide();
+            $(".barn1").show();
+
+            $("button").click(function(){
+                switch (counter)
+                {
+                    case 0:
+                        $("img").hide(1000);
+                        $(".barn2").show(1000);
+                        counter += 1;
+                        break;
+                    case 1:
+                        $("img").hide(1000);
+                        $(".fig1").show(1000);
+                        counter += 1;
+                        break;
+                    case 2:
+                        $("img").hide(1000);
+                        $(".fig2").show(1000);
+                        counter += 1;
+                        break;
+                    case 3:
+                        $("img").hide(1000);
+                        $(".barn1").show(1000);
+                        counter = 0;
+                        break;
+                }
+            });
+        });
+    </script>
+    <link rel="stylesheet" type="text/css" href="main.css"/>
+    <title>Slideshow</title>
+    <meta charset="UTF-8" />
+</head>
+<body>
+    <div style="height: 300px; width: 256px; margin: auto; margin-top: 10%;">
+        <img class="barn1" src="slideshow-images/barn1.jpg" alt="AI - Barn1" style="width: 256px; height: 256px;">
+        <img class="barn2" src="slideshow-images/barn2.jpg" alt="AI - Barn2" style="width: 256px; height: 256px;">
+        <img class="fig1" src="slideshow-images/fig1.jpg" alt="AI - Fig1" style="width: 256px; height: 256px;">
+        <img class="fig2" src="slideshow-images/fig2.jpg" alt="AI - Fig2" style="width: 256px; height: 256px;">
+    </div>
+    <div style="height: 50px; width: 200px; margin: auto;">
+        <button>Slide that show!</button>
+        <p><a href="index.html">Back</a></p>
+    </div>
+</body>
+</html>
