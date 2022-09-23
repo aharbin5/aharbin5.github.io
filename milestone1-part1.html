@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="jquery-3.6.1.js"></script>
+    
+    <script>
+        $("document").ready(function(){
+            var toWrite = "";
+            $.getJSON("json-files/google-books-book.json", function(data){
+                toWrite += data.id;
+            });
+
+            $("#first-book").html(toWrite);
+        });
+    </script>
+    <link rel="stylesheet" type="text/css" href="main.css"/>
+    <title>Milestone 1 - Part 1</title>
+    <meta charset="UTF-8" />
+</head>
+<body>
+    <h1>Milestone 1 - Part 1</h1>
+    <h2>This is the full collection of books from </h2>
+    <div class="boxes" id="first-book">
+        <!-- jQuery will put stuff here-->
+    </div><br>
+    <div class="boxes">
+        <p><a href="index.html">Back</a></p>
+    </div>
+</body>
+</html>
