@@ -11,15 +11,18 @@
                     $("#first-book").show();
 
                     var query = $("#query").val();
-                    console.log(query);
+                    console.log(data);
+
+                    var regular = new RegExp(query, 'i');
 
                     for (let i = 0; i < data.items.length; i++)
                     {
-                        if (!data.items[i].volumeInfo.title.includes(query))
+                        if (!data.items[i].volumeInfo.title.match(regular))
                         {
                             delete data.items[i];
                         }
                     }
+
                     data.items.forEach(function(x){
                         var saleability = "";
                         if (x.saleInfo.saleability != "NOT_FOR_SALE")
@@ -220,8 +223,19 @@
 </head>
 <body>
     <h1>Milestone 1 - Part 1</h1>
-    <h2>This is the full collection of books from google apis search,</h2>
+    <h2>This is the full collection of books from "google-books-seach" query</h2>
     <div class="boxes">
+        <h3>Important</h3>
+        <p>
+            Hello, I wanted to make this note to let you know that
+            the way this search function is intended to work is that
+            if you leave the bar blank, it'll show everything in 
+            the JSON file.  If you put in a search word, it checks
+            if that string is in the TITLE of the books and returns
+            the books that are valid.<br>
+            All 10 books are here, searchable, & displayed in a decent 
+            format that covers 99% of the information in the json files.
+        </p><hr>
         <label>Search Book Name</label>
         <input id="query" type="text">
         <button id="search">Go!</button>
