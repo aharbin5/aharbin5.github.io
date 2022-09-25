@@ -2,15 +2,15 @@
 <html>
 <head>
     <script src="jquery-3.6.1.js"></script>
-    
     <script>
         $("document").ready(function(){
-            var toWrite = "";
-            $.getJSON("json-files/google-books-book.json", function(data){
-                toWrite += data.id;
+            $("#first-book").hide();
+            $("#search").click(function(){
+                $.getJSON("https://www.googleapis.com/books/v1/volumes?q=modern%20web", function(data){
+                    console.log(data);
+                    $("#first-book").text(data);
+                });
             });
-
-            $("#first-book").html(toWrite);
         });
     </script>
     <link rel="stylesheet" type="text/css" href="main.css"/>
@@ -20,11 +20,14 @@
 <body>
     <h1>Milestone 1 - Part 1</h1>
     <h2>This is the full collection of books from </h2>
+    <div class="boxes">
+        <label>Search Book Name</label>
+        <input type="text">
+        <button id="search">Go!</button>
+        <p style="text-align: right; position: absolute;"><a href="index.html">Back</a></p>
+    </div><br>
     <div class="boxes" id="first-book">
         <!-- jQuery will put stuff here-->
     </div><br>
-    <div class="boxes">
-        <p><a href="index.html">Back</a></p>
-    </div>
 </body>
 </html>
