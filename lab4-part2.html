@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="main.css"/>
+<script src="jquery-3.6.1.js"></script>
+<title>Lab 4 - Part 2</title>
+<meta charset="UTF-8" />
+<script>
+    $("document").ready(function(){
+        var data = localStorage.getItem("albumInfo");
+        console.log(data);
+        localStorage.clear();
+        var usableURL;
+        var albumName;
+
+        if (data != null)
+        {
+            usableURL = "https://jsonplaceholder.typicode.com/photos?albumId=" + JSON.parse(data).album_id;
+            albumName = JSON.parse(data).album_name
+        }
+        else
+        {
+            usableURL = "https://jsonplaceholder.typicode.com/photos?albumId=1"
+            albumName = "quidem molestiae enim";
+        }
+
+        $.ajax({url: usableURL, success: function(result){
+                console.log(result);
+                
+                var toDiv = `
+                    <h1>${albumName}</h1><br>
+                    
+                    <div class="boxes">
+                    <a href="index.html">Back</a>
+                    </div><br>
+                `;
+                for (let i = 0; i < result.length; i++) 
+                {
+                    toDiv += `
+                        <div class="boxes">
+                            <h3>${result[i].title}</h3>
+                            <a href="${result[i].url}"><img src="${result[i].thumbnailUrl}"></a>
+                        </div><br>
+                    `;
+                }
+
+                $("body").html(toDiv);
+            }});
+    });
+
+</script>
+</head>
+<body>
+    <div class="boxes" id="main"></div>
+</body>
+</html>
