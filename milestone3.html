@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="jquery-3.6.1.js"></script>
+    <script>
+        function funkyFunc(bookID)
+        {
+            usableURL = `https://www.googleapis.com/books/v1/volumes/` + bookID;
+
+            $.ajax({url: usableURL, success: function(x){   
+
+                var saleability = "";
+
+                if (x.saleInfo.saleability != "NOT_FOR_SALE" && x.saleInfo.amount != null)
+                {
+                    saleability = `<a href="${x.saleInfo.buyLink}">Buy now for ${x.saleInfo.listPrice.amount}</a>`;
+                }
+                else if (x.saleInfo.amount == null)
+                {
+                    saleability = `This volume is FREE`;
+                }
+                else
+                {
+                    saleability = "Not available for purchase";
+                }   
+
+                var toWrite = "";
+
+                // Big header that displays reguardless
+                toWrite += `
+                <div>
+                <span>
+                    <a href="${x.volumeInfo.canonicalVolumeLink}"><h1>${x.volumeInfo.title}</h1></a>`;
+                
+                if (x.volumeInfo.subtitle != null)
+                {
+                    toWrite += `<h2>${x.volumeInfo.subtitle}</h2>`;
+                }
+
+                toWrite += `
+                    <a href="${x.volumeInfo.previewLink}"><img src="${x.volumeInfo.imageLinks.smallThumbnail}" style="float: right" height="169px" width="128px"></a>
+                </span>
+                    <p>
+                        <strong>Description:</strong><br>
+                        ${x.volumeInfo.description}<br>
+                        <strong>Page Count:</strong> ${x.volumeInfo.pageCount}<br>
+                        ${saleability}<br><br>
+                        ${x.volumeInfo.averageRating} / 5 (${x.volumeInfo.ratingsCount} Rating(s))<br>
+                    `;
+
+                if (x.volumeInfo.dimensions != null)
+                {
+                    toWrite += `Book Dimensions (LxWxH): ${x.volumeInfo.dimensions.height} x ${x.volumeInfo.dimensions.width} x ${x.volumeInfo.dimensions.thickness}<br>`;
+                }
+
+                toWrite += `
+                        <a href="${x.volumeInfo.imageLinks.extraLarge}">Full-Size Book Cover</a>
+                    </p>`;
+
+                // Information related to access
+                // Yes having this many if statements slows down page loading times but I don't know how else to do it.
+                toWrite += `<details><summary>Access Info</summary><ul>`;
+
+                if (x.accessInfo.accessViewStatus != "NONE")
+                {
+                    toWrite += "<li>Sample Access</li>";
+                }
+                toWrite += `<li>Accessable in ${x.accessInfo.country}</li>`;
+                if (x.accessInfo.embeddable)
+                {
+                    toWrite += `<li>This volume is embeddable</li>`;
+                }
+                if (x.accessInfo.epub.isAvailable)
+                {
+                    toWrite += `<li>Available as ePub</li>`;
+                }
+                else
+                {
+                    toWrite += `<li>Unavailable as ePub</li>`;
+                }
+                if (x.accessInfo.pdf.isAvailable)
+                {
+                    toWrite += `<li>Available as PDF</li>`;
+                }
+                else
+                {
+                    toWrite += `<li>Unavailable as PDF</li>`;
+                }
+                if (x.accessInfo.publicDomain)
+                {
+                    toWrite += `<li>This volume is public domain</li>`;
+                }
+                else
+                {
+                    toWrite += `<li>This volume is not public domain</li>`;
+                }
+                if (x.accessInfo.quoteSharingAvailable)
+                {
+                    toWrite += `<li>Quote sharing is available</li>`;
+                }
+                else
+                {
+                    toWrite += `<li>Quote sharing is unavailable</li>`;
+                }
+                if (x.accessInfo.textToSpeechAvailable)
+                {
+                    toWrite += `<li>Text-to-speech is available</li>`;
+                }
+                else
+                {
+                    toWrite += `<li>Text-to-speech is unavailable</li>`;
+                }
+                if (x.accessInfo.viewability == "PARTIAL")
+                {
+                    toWrite += `<li>This volume is partially viewable</li>`;
+                }
+                else
+                {
+                    toWrite += `<li>This volume is not viewable</li>`;
+                }
+                    
+                toWrite += `</ul></details>`;
+                
+                // Sale section
+                if (x.saleInfo.saleability != "NOT_FOR_SALE" && x.saleInfo.amount != null)
+                {
+                    toWrite  += `
+                    <details>
+                    <summary>All Sales Info</summary>
+                        <ul>
+                        <li><a href="${x.saleInfo.buyLink}">Buy It Now</a><br></li>
+                        <li>List Price (${x.saleInfo.country}): ${x.saleInfo.listPrice.amount} ${x.saleInfo.listPrice.currencyCode}<br></li>
+                        <li>Retail Price (${x.saleInfo.country}): ${x.saleInfo.retailPrice.amount} ${x.saleInfo.retailPrice.currencyCode}<br></li>`;
+
+                    if (x.saleInfo.isEbook)
+                    {
+                        toWrite += `<li>This volume is an eBook</li>`;
+                    }
+                    else
+                    {
+                        toWrite += `<li>This volume is not an eBook</li>`;
+                    }
+                    toWrite += `</ul></details>`;
+                }
+                else if (x.saleInfo.amount == null)
+                {
+                    toWrite  += `
+                    <details>
+                    <summary>All Sales Info</summary>
+                        <ul>
+                        <li><a href="${x.saleInfo.buyLink}">Buy It Now</a><br></li>
+                        <li>This volume is FREE</li>`;
+
+                    if (x.saleInfo.isEbook)
+                    {
+                        toWrite += `<li>This volume is an eBook</li>`;
+                    }
+                    else
+                    {
+                        toWrite += `<li>This volume is not an eBook</li>`;
+                    }
+                    toWrite += `</ul></details>`;
+                }
+                else
+                {
+                    toWrite += "<strong>This volume is not for sale</strong>";
+                }
+
+                // Get either the author or list of authors.
+                var authors = "";
+                if (x.volumeInfo.authors.length == 1)
+                {
+                    authors = x.volumeInfo.authors[0];
+                }
+                else
+                {
+                    x.volumeInfo.authors.forEach(function(x){
+                        authors += x + ", ";
+                    });
+                    authors = authors.slice(0, authors.length - 1);
+                }
+
+                // If there are categories; show them, if not; show nothing
+                var categories = "";
+                if (x.volumeInfo.categories == undefined)
+                {
+                    categories = "<strong>No categories are associated with this volume</strong>";
+                }
+                else
+                {
+                    if (x.volumeInfo.categories.length == 1)
+                    {
+                        categories = x.volumeInfo.categories[0];
+                    }
+                    else
+                    {
+                        x.volumeInfo.categories.forEach(function(x){
+                            categories += x + ", ";
+                        });
+                        categories = categories.slice(0, categories.length - 1);
+                    }
+                }
+
+                // Info about the volume
+                toWrite += `
+                    <details>
+                    <summary>Full Volume Info</summary><ul>`;
+                if (x.volumeInfo.allowAnonLogging)
+                {
+                    toWrite += `<li>Anonymous Logging is allowed</li>`;
+                }
+                else
+                {
+                    toWrite += `<li>Anonymous Logging is not allowed</li>`;
+                }
+
+                toWrite += `
+                    <li>Authors: ${authors}<br></li>
+                    <li><a href="${x.volumeInfo.canonicalVolumeLink}">Cannonical Volume Link</a><br></li>
+                    <li>${categories}<br></li>
+                    <li>ISBN-10: ${x.volumeInfo.industryIdentifiers[1].identifier}<br></li>
+                    <li>ISBN-13: ${x.volumeInfo.industryIdentifiers[0].identifier}<br></li>
+                    <li>Language: ${x.volumeInfo.language}<br></li>`;
+
+                if (x.volumeInfo.maturityRating == "NOT_MATURE")
+                {
+                    toWrite += `<li>This volume is meant for any audiences</li>`;
+                }
+                else
+                {
+                    toWrite += `<li>This volume is meant for mature audiences</li>`;
+                }
+
+                toWrite += `
+                    <li><a href="${x.volumeInfo.previewLink}">Preview</a><br></li>
+                    <li>Print Type: ${x.volumeInfo.printType}<br></li>
+                    <li>Published: ${x.volumeInfo.publishedDate}<br></li>
+                    <li>Publisher: ${x.volumeInfo.publisher}<br></li>
+                    </ul>
+                    </details
+                    </div><hr>
+                `;
+                
+                $("#selected").html(toWrite);
+            }});
+        }
+
+        function stupidPages(pageNumber)
+        {
+            var query = `https://www.googleapis.com/books/v1/volumes/?q="` + $("#query").val() + `"&startIndex=` + pageNumber;
+
+            $.getJSON(query, function (json)
+            {
+                var toHTML = "";
+                for (let i = 0; i < 10; i++)
+                {
+                    toHTML += `<a href="#0" onclick="funkyFunc('${json.items[i].id}')">${json.items[i].volumeInfo.title}</a><br>`;
+
+                    if (json.items[i].volumeInfo.imageLinks == null)
+                    {
+                        toHTML += `
+                            <p>This volume has doesn't have a thumbnail, enjoy a coconut instead!<br>
+                            <img height=128px width=128px src="coconut.jpg"></p>
+                        `;
+                    }
+                    else
+                    {
+                        toHTML += `
+                            <img src="${json.items[i].volumeInfo.imageLinks.smallThumbnail}" alt="${json.items[i].volumeInfo.title}"><br><br>
+                        `;
+                    }
+                }
+
+                $("#query-section").html(toHTML);
+            });
+
+            switch (pageNumber)
+            {
+                case 0:
+                    $("#numbers").html(`
+                    <label>Page No.</label>
+                    <a onclick="stupidPages(0)">1</a>
+                    <a href="#0" onclick="stupidPages(10)">2</a>
+                    <a href="#0" onclick="stupidPages(20)">3</a>
+                    <a href="#0" onclick="stupidPages(30)">4</a>
+                    <a href="#0" onclick="stupidPages(40)">5</a>
+                    <a href="index.html">Back</a>`);
+                    break;
+                case 10:
+                    $("#numbers").html(`
+                    <label>Page No.</label>
+                    <a href="#0"onclick="stupidPages(0)">1</a>
+                    <a onclick="stupidPages(10)">2</a>
+                    <a href="#0" onclick="stupidPages(20)">3</a>
+                    <a href="#0" onclick="stupidPages(30)">4</a>
+                    <a href="#0" onclick="stupidPages(40)">5</a>
+                    <a href="index.html">Back</a>`);
+                    break;
+                case 20:
+                    $("#numbers").html(`
+                    <label>Page No.</label>
+                    <a href="#0"onclick="stupidPages(0)">1</a>
+                    <a href="#0" onclick="stupidPages(10)">2</a>
+                    <a onclick="stupidPages(20)">3</a>
+                    <a href="#0" onclick="stupidPages(30)">4</a>
+                    <a href="#0" onclick="stupidPages(40)">5</a>
+                    <a href="index.html">Back</a>`);
+                    break;
+                case 30:
+                    $("#numbers").html(`
+                    <label>Page No.</label>
+                    <a href="#0"onclick="stupidPages(0)">1</a>
+                    <a href="#0" onclick="stupidPages(10)">2</a>
+                    <a href="#0" onclick="stupidPages(20)">3</a>
+                    <a onclick="stupidPages(30)">4</a>
+                    <a href="#0" onclick="stupidPages(40)">5</a>
+                    <a href="index.html">Back</a>`);
+                    break;
+                case 40:
+                    $("#numbers").html(`
+                    <label>Page No.</label>
+                    <a href="#0"onclick="stupidPages(0)">1</a>
+                    <a href="#0" onclick="stupidPages(10)">2</a>
+                    <a href="#0" onclick="stupidPages(20)">3</a>
+                    <a href="#0" onclick="stupidPages(30)">4</a>
+                    <a onclick="stupidPages(40)">5</a>
+                    <a href="index.html">Back</a>`);
+                    break;
+            }
+        }
+
+        $("document").ready(function(){
+            // Get my public bookshelf
+            $.getJSON(`https://www.googleapis.com/books/v1/users/104347094268342544159/bookshelves/1001/volumes`, function (json)
+            {
+                var toHTML = "";
+                console.log(json);
+                for (let i = 0; i < json.items.length; i++)
+                {
+                    toHTML += `
+                        <div style="float: left; margin-left: 15%">
+                            <a href="#0" onclick="funkyFunc('${json.items[i].id}')"><strong>${json.items[i].volumeInfo.title}</strong></a><br>
+                            <img src="${json.items[i].volumeInfo.imageLinks.smallThumbnail}" alt="${json.items[i].volumeInfo.title}">
+                        </div>
+                    `;
+                }
+
+                $("#myBookshelf").html(toHTML);
+            });
+        });
+
+    </script>
+    <style>
+        h1 {text-align: center; font-family: sans-serif; text-align: center;}
+        h2 {text-align: left; font-family: sans-serif; font-style: italic; text-align: center;}
+        h3, h4 {font-family: Cambria, sans-serif; font-style: italic}
+
+        .boxes {width: 66.66%; border: 2px solid black; padding: 3px; margin: auto; background-color: rgb(85, 99, 112);}
+        .shelfBox {width: 66.66%; border: 2px solid black; padding: 3px; margin: auto; height:220px; background-color: rgb(85, 99, 112);}
+        .selectedBox {width: 33.33%; border: 2px solid black; padding: 3px; margin: auto; float: right;; background-color: rgb(85, 99, 112);}
+        .resultBox {width: 66.66%; border: 2px solid black; padding: 3px; margin: auto; background-color: rgb(85, 99, 112);}
+        body {background: lightslategray; color: black; font-family: Cambria;}
+    </style>
+    <title>Milestone 3</title>
+    <meta charset="UTF-8" />
+</head>
+<body>
+    <h1>Milestone 3</h1>
+    <h2>Google Search With Pages</h2>
+    <div class="boxes">
+        <label>Search Book Name</label>
+        <input id="query" type="text">
+        <a href="#0" onclick="stupidPages(0)">Go!</a>
+        <div style="float: right;" id="numbers">
+            <label>Page No.</label>
+            <a href="#0" onclick="stupidPages(0)">1</a>
+            <a href="#0" onclick="stupidPages(10)">2</a>
+            <a href="#0" onclick="stupidPages(20)">3</a>
+            <a href="#0" onclick="stupidPages(30)">4</a>
+            <a href="#0" onclick="stupidPages(40)">5</a>
+            <a href="index.html">Back</a>
+        </div>
+    </div><br>
+
+    <div class="shelfBox" id="myBookshelf"></div><br>
+    <div class="resultBox"">
+        <div class="selectedBox" id="selected"></div>
+        <p id="query-section"></p>
+    </div>
+</body>
+</html>

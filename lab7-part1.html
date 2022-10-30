@@ -14,12 +14,17 @@
             $("#query-section").hide();
             $("#search").click(function(){
                 // Construct the Query
-                var query = `https://api.bing.com/osjson.aspx?query=`+ $("query").val;
+                var query = `https://api.bing.com/osjson.aspx?query=`+ $("#query").val() + "&JsonType=Callback&JsonCallback=?";
 
                 $.getJSON(query, function (json) {
-                    var toHTML = "";
-                    console.log(json);
-
+                    var toHTML = "<p>";
+                    for (let i = 0; i < json[1].length; i++)
+                    {
+                        toHTML += `
+                            ${json[1][i]}<br>
+                        `;
+                    }
+                    toHTML += "</p>"
                     $("#query-section").html(toHTML);
                 });
 
@@ -41,19 +46,12 @@
 </head>
 <body>
     <h1>Lab 7 - Part 1</h1>
-    <h2>This search box queries the Bing API and returns 50 results in 5 pages</h2>
+    <h2>This search box queries the Bing API</h2>
     <div class="boxes">
-        <label>Search Book Name</label>
+        <label>Search Term</label>
         <input id="query" type="text">
         <button id="search">Go!</button>
-        <div style="float: right;">
-            <label>Page No.</label>
-            <button>1</button>
-            <button>2</button>
-            <button>3</button>
-            <button>4</button>
-            <button>5</button>
-            <a href="index.html">Back</a>
+        <a href="index.html">Back</a>
         </div>
     </div><br>
     <div class="boxes" id="query-section">
