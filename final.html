@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="jquery-3.6.1.js"></script>
+        <!-- Moustache if you want it-->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.2.0/mustache.min.js"></script>
+
+        <script>
+            $("#searchbutton").click(function() {
+                console.log("buttoned!");
+            });
+        </script>
+
+        <style>
+            h1 {font-family: sans-serif; text-align: center;}
+            h2 {font-family: sans-serif; font-style: italic; text-align: center;}
+            h3, h4 {font-family: Cambria, sans-serif; font-style: italic}
+            body {background: lightslategray; color: black; font-family: Cambria;}
+            .boxes {width: 90%; border: 2px solid black; padding: 3px; margin: auto; background-color: rgb(85, 99, 112);}
+        </style>
+
+        <title>Final Project</title>
+        <meta charset="UTF-8" />
+    </head>
+    <body>
+        <div class="boxes" id="banner">
+            <h1>Banner Text</h1>
+        </div>
+        <div class="boxes" id="searchbar">
+            <input id="query" type="text">
+            <button id="searchbutton">Big Button</button>
+        </div>
+        <div class="boxes" id="suggested">
+            <h2>Here's where suggested movies should go first before you search</h2>
+        </div>
+        <div class="boxes" id="results">
+            <span><h3>Movie1</h3></span>
+            <span><h3>Movie2</h3></span>
+            <span><h3>Movie3</h3></span>
+            <span><h3>Movie4</h3></span>
+            <span><h3>Movie5</h3></span>
+        </div>
+    </body>
+</html>
