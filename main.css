@@ -1,6 +1,9 @@
-h1 {text-align: center; font-family: sans-serif; text-align: center;}
-h2 {text-align: left; font-family: sans-serif; font-style: italic; text-align: center;}
+h1 {font-family: sans-serif; text-align: center;}
+h2 {font-family: sans-serif; font-style: italic; text-align: center;}
 h3, h4 {font-family: Cambria, sans-serif; font-style: italic}
 
 .boxes {width: 66.66%; border: 2px solid black; padding: 3px; margin: auto; background-color: rgb(85, 99, 112);}
+.notice-box {width: 66.66%; border: 2px solid rgb(164, 165, 168); padding: 3px; margin: auto; background-color: rgb(164, 165, 168);}
 body {background: lightslategray; color: black; font-family: Cambria;}
+a:link {color: rgb(242, 239, 229)}
+a:visited {color: rgb(164, 165, 168)}
