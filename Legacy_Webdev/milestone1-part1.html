@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="jquery-3.6.1.js"></script>
+    <script>
+        $("document").ready(function(){
+            $("#first-book").hide();
+            $("#search").click(function(){
+                $.getJSON("https://www.googleapis.com/books/v1/volumes?q=modern%20web", function(data){
+                    var toWrite = "";
+                    $("#first-book").show();
+
+                    var query = $("#query").val();
+                    console.log(data);
+
+                    var regular = new RegExp(query, 'i');
+
+                    for (let i = 0; i < data.items.length; i++)
+                    {
+                        if (!data.items[i].volumeInfo.title.match(regular))
+                        {
+                            delete data.items[i];
+                        }
+                    }
+
+                    // This is a redundant search for the saleability for the description
+                    data.items.forEach(function(x){
+                        var saleability = "";
+                        if (x.saleInfo.saleability != "NOT_FOR_SALE")
+                        {
+                            saleability = `<a href="${x.saleInfo.buyLink}">Buy now for ${x.saleInfo.listPrice.amount}</a>`;
+                        }
+                        else
+                        {
+                            saleability = "Not available for purchase";
+                        }   
+
+                        // Big header that displays reguardless
+                        toWrite += `
+                        <div>
+                        <span>
+                            <a href="${x.volumeInfo.canonicalVolumeLink}"><h1>${x.volumeInfo.title}</h1></a>
+                            <h2>${x.volumeInfo.subtitle}</h2>
+                            <a href="${x.volumeInfo.previewLink}"><img src="${x.volumeInfo.imageLinks.smallThumbnail}" style="float: right" height="169px" width="128px"></a>
+                        </span>
+                            <p>
+                                <strong>Description:</strong><br>
+                                ${x.volumeInfo.description}<br>
+                                <strong>Page Count:</strong> ${x.volumeInfo.pageCount}<br>
+                                ${saleability}<br><br>
+                            </p>`;
+
+                        // Information related to access
+                        // Yes having this many if statements slows down page loading times but I don't know how else to do it.
+                        toWrite += `<details><summary>Access Info</summary><ul>`;
+
+                        if (x.accessInfo.accessViewStatus != "NONE")
+                        {
+                            toWrite += "<li>Sample Access</li>";
+                        }
+                        toWrite += `<li>Accessable in ${x.accessInfo.country}</li>`;
+                        if (x.accessInfo.embeddable)
+                        {
+                            toWrite += `<li>This volume is embeddable</li>`;
+                        }
+                        if (x.accessInfo.epub.isAvailable)
+                        {
+                            toWrite += `<li>Available as ePub</li>`;
+                        }
+                        else
+                        {
+                            toWrite += `<li>Unavailable as ePub</li>`;
+                        }
+                        if (x.accessInfo.pdf.isAvailable)
+                        {
+                            toWrite += `<li>Available as PDF</li>`;
+                        }
+                        else
+                        {
+                            toWrite += `<li>Unavailable as PDF</li>`;
+                        }
+                        if (x.accessInfo.publicDomain)
+                        {
+                            toWrite += `<li>This volume is public domain</li>`;
+                        }
+                        else
+                        {
+                            toWrite += `<li>This volume is not public domain</li>`;
+                        }
+                        if (x.accessInfo.quoteSharingAvailable)
+                        {
+                            toWrite += `<li>Quote sharing is available</li>`;
+                        }
+                        else
+                        {
+                            toWrite += `<li>Quote sharing is unavailable</li>`;
+                        }
+                        if (x.accessInfo.textToSpeechAvailable)
+                        {
+                            toWrite += `<li>Text-to-speech is available</li>`;
+                        }
+                        else
+                        {
+                            toWrite += `<li>Text-to-speech is unavailable</li>`;
+                        }
+                        if (x.accessInfo.viewability == "PARTIAL")
+                        {
+                            toWrite += `<li>This volume is partially viewable</li>`;
+                        }
+                        else
+                        {
+                            toWrite += `<li>This volume is not viewable</li>`;
+                        }
+                            
+                        toWrite += `</ul></details>`;
+                        
+                        if (x.saleInfo.saleability != "NOT_FOR_SALE")
+                        {
+                            toWrite  += `
+                            <details>
+                            <summary>All Sales Info</summary>
+                                <ul>
+                                <li><a href="${x.saleInfo.buyLink}">Buy It Now</a><br></li>
+                                <li>List Price (${x.saleInfo.country}): ${x.saleInfo.listPrice.amount} ${x.saleInfo.listPrice.currencyCode}<br></li>
+                                <li>Retail Price (${x.saleInfo.country}): ${x.saleInfo.retailPrice.amount} ${x.saleInfo.retailPrice.currencyCode}<br></li>`;
+
+                            if (x.saleInfo.isEbook)
+                            {
+                                toWrite += `<li>This volume is an eBook</li>`;
+                            }
+                            else
+                            {
+                                toWrite += `<li>This volume is not an eBook</li>`;
+                            }
+                            toWrite += `</ul></details>`;
+                        }
+                        else
+                        {
+                            toWrite += "<strong>This volume is not for sale</strong>";
+                        }
+
+                        // Get either the author or list of authors.
+                        var authors = "";
+                        if (x.volumeInfo.authors.length == 1)
+                        {
+                            authors = x.volumeInfo.authors[0];
+                        }
+                        else
+                        {
+                            x.volumeInfo.authors.forEach(function(x){
+                                authors += x + ", ";
+                            });
+                            authors = authors.slice(0, authors.length - 1);
+                        }
+
+                        // If there are categories; show them, if not; showing nothing
+                        var categories = "";
+                        if (x.volumeInfo.categories == undefined)
+                        {
+                            categories = "<strong>No categories are associated with this volume</strong>";
+                        }
+                        else
+                        {
+                            if (x.volumeInfo.categories.length == 1)
+                            {
+                                categories = x.volumeInfo.categories[0];
+                            }
+                            else
+                            {
+                                x.volumeInfo.categories.forEach(function(x){
+                                    categories += x + ", ";
+                                });
+                                categories = categories.slice(0, categories.length - 1);
+                            }
+                        }
+
+                        toWrite += `
+                            <details>
+                            <summary>Full Volume Info</summary><ul>`;
+                        if (x.volumeInfo.allowAnonLogging)
+                        {
+                            toWrite += `<li>Anonymous Logging is allowed</li>`;
+                        }
+                        else
+                        {
+                            toWrite += `<li>Anonymous Logging is not allowed</li>`;
+                        }
+
+                        toWrite += `
+                            <li>Authors: ${authors}<br></li>
+                            <li><a href="${x.volumeInfo.canonicalVolumeLink}">Cannonical Volume Link</a><br></li>
+                            <li>${categories}<br></li>
+                            <li>ISBN-10: ${x.volumeInfo.industryIdentifiers[1].identifier}<br></li>
+                            <li>ISBN-13: ${x.volumeInfo.industryIdentifiers[0].identifier}<br></li>
+                            <li>Language: ${x.volumeInfo.language}<br></li>`;
+
+                        if (x.volumeInfo.maturityRating == "NOT_MATURE")
+                        {
+                            toWrite += `<li>This volume is meant for any audiences</li>`;
+                        }
+                        else
+                        {
+                            toWrite += `<li>This volume is meant for mature audiences</li>`;
+                        }
+
+                        toWrite += `
+                            <li><a href="${x.volumeInfo.previewLink}">Preview</a><br></li>
+                            <li>Print Type: ${x.volumeInfo.printType}<br></li>
+                            <li>Published: ${x.volumeInfo.publishedDate}<br></li>
+                            <li>Publisher: ${x.volumeInfo.publisher}<br></li>
+                            </ul>
+                            </details
+                            </div><hr>
+                        `;
+                    });
+                    $("#first-book").html(toWrite);
+                });
+            });
+        });
+    </script>
+    <style>
+        h1 {text-align: center; font-family: sans-serif; text-align: center;}
+        h2 {text-align: left; font-family: sans-serif; font-style: italic; text-align: center;}
+        h3, h4 {font-family: Cambria, sans-serif; font-style: italic}
+
+        .boxes {width: 66.66%; border: 2px solid black; padding: 3px; margin: auto; background-color: rgb(85, 99, 112);}
+        body {background: lightslategray; color: black; font-family: Cambria;}
+    </style>>
+    <title>Milestone 1 - Part 1</title>
+    <meta charset="UTF-8" />
+</head>
+<body>
+    <h1>Milestone 1 - Part 1</h1>
+    <h2>This is the full collection of books from "google-books-seach" query</h2>
+    <div class="boxes">
+        <h3>Important</h3>
+        <p>
+            Hello, I wanted to make this note to let you know that
+            the way this search function is intended to work is that
+            if you leave the bar blank, it'll show everything in 
+            the JSON file.  If you put in a search word, it checks
+            if that string is in the TITLE of the books and returns
+            the books that are valid.<br>
+            All 10 books are here, searchable, & displayed in a decent 
+            format that covers 99% of the information in the json files.
+        </p><hr>
+        <label>Search Book Name</label>
+        <input id="query" type="text">
+        <button id="search">Go!</button>
+        <a href="index.html">Back</a>
+    </div><br>
+    <div class="boxes" id="first-book">
+    </div><br>
+</body>
+</html>

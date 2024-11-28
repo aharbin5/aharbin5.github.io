@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="jquery-3.6.1.js"></script>
+    <script>
+    $("document").ready(function(){
+        $("#query-section").hide();
+        $("#search").click(function(){
+            var URI = "http://ZiptasticAPI.com/" + $("#zipcode").val();
+
+            $.getJSON(URI, function (json) {
+                var toHTML = `
+                <p>
+                Country: ${json.country}<br>
+                State: ${json.state}<br>
+                City: ${json.city}<br>
+                </p>
+                `;
+                $("#query-section").html(toHTML);
+            });
+
+            $("#query-section").show();
+        });
+    });
+
+    </script>
+    <style>
+        h1 {text-align: center; font-family: sans-serif; text-align: center;}
+        h2 {text-align: left; font-family: sans-serif; font-style: italic; text-align: center;}
+        h3, h4 {font-family: Cambria, sans-serif; font-style: italic}
+
+        .boxes {width: 66.66%; border: 2px solid black; padding: 3px; margin: auto; background-color: rgb(85, 99, 112);}
+        body {background: lightslategray; color: black; font-family: Cambria;}
+    </style>
+    <title>Lab 7 - Part 2</title>
+    <meta charset="UTF-8" />
+</head>
+<body>
+    <h1>Lab 7 - Part 2</h1>
+    <h2>Returns the City and State of an entered Zip Code</h2>
+    <div class="boxes">
+        <label>Enter zip code: </label>
+        <input id="zipcode" type="text">
+        <button id="search">Locate</button>
+        <div style="float: right;">
+            <a href="index.html">Back</a>
+        </div>
+    </div><br>
+    <div class="boxes" id="query-section">
+    </div><br>
+</body>
+</html>

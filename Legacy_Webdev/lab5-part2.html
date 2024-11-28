@@ -1,0 +1,42 @@
+<html>
+    <head>
+        <style>
+            h1 {text-align: center; font-family: sans-serif; text-align: center;}
+            h2 {text-align: left; font-family: sans-serif; font-style: italic; text-align: center;}
+            h3, h4 {font-family: Cambria, sans-serif; font-style: italic}
+    
+            .boxes {width: 66.66%; border: 2px solid black; padding: 3px; margin: auto; background-color: rgb(85, 99, 112);}
+            body {background: lightslategray; color: black; font-family: Cambria;}
+        </style>
+        <title>Lab 5 - Part 2</title>
+        <meta charset="UTF-8" />
+        <script src="jquery-3.6.1.js"></script>
+        <script>
+            $("document").ready(function() {
+                $.getJSON(`https://www.googleapis.com/books/v1/volumes/?q="data analysis"&maxResults=10`, function (json)
+                {
+                    var toHTML = "";
+                    console.log(json);
+                    for (let i = 0; i < json.items.length; i++)
+                    {
+                        toHTML += `
+                            <a href="${json.items[i].volumeInfo.canonicalVolumeLink}"><h3>${json.items[i].volumeInfo.title}</h3></a>
+                            <img src="${json.items[i].volumeInfo.imageLinks.smallThumbnail}" alt="${json.items[i].volumeInfo.title}"><br><br>
+                        `;
+                    }
+
+                    $("#result").html(toHTML);
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <h1>Lab 5 - Part 2</h1>
+        <h2>Top 10 results for "data analysis"</h2>
+        <div class="boxes">
+            <a href="index.html">Back</a>
+        </div><br>
+        <div class="boxes" id="result">
+        </div><br>
+    </body>
+</html>
