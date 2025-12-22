@@ -7,3 +7,5 @@ h3, h4 {font-family: Cambria, sans-serif; font-style: italic}
 body {background: lightslategray; color: black; font-family: Cambria;}
 a:link {color: rgb(242, 239, 229)}
 a:visited {color: rgb(164, 165, 168)}
+
+th {border:2px solid black; width:10%}
